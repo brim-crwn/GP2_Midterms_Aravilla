@@ -323,6 +323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   GameOverScreen: {fileID: 1588684682}
+  GameScore: {fileID: 1320773769}
 --- !u!1 &270712228
 GameObject:
   m_ObjectHideFlags: 0
