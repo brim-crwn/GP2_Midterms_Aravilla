@@ -1,51 +1,70 @@
 using UnityEngine;
 
-public abstract class Actor : MonoBehaviour
+public abstract class Actor : MonoBehaviour, IDamageable
 {
-    [SerializeField] protected float speed = 5f;
-    Rigidbody rb;
+    [SerializeField] protected float speed = 1f;
+    private Rigidbody rb;
+
+    [SerializeField] private int ScoreValue = 10;
 
     private GameObject player;
     public string bulletTag = "Bullet";
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Color enemyColor;
+    private Renderer enemyRenderer;
+
+    public Color DamageColor =>
+        enemyRenderer != null
+            ? enemyRenderer.material.color
+            : enemyColor;
+
     protected virtual void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
+
+        if (rb != null)
+        {
+            rb.useGravity = false;
+        }
+
+        enemyRenderer = GetComponent<Renderer>();
+
+        if (player == null)
+        {
+            Debug.LogWarning("Player object not found.");
+        }
     }
 
-    // Update is called once per frame
     protected virtual void Update()
     {
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+        if (player == null)
+            return;
+
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            player.transform.position,
+            speed * Time.deltaTime
+        );
     }
 
-    private void OnCollisionEnter(Collision collision)
+    protected virtual void Awake()
     {
-        
-        GameObject otherObj = collision.gameObject;
-        Renderer myRenderer = GetComponent<Renderer>();
-        Renderer otherRenderer = otherObj.GetComponent<Renderer>();
+        enemyRenderer = GetComponent<Renderer>();
 
-        if (otherObj.CompareTag(bulletTag))
+        if (enemyRenderer != null)
         {
-            if (myRenderer != null && otherRenderer != null)
-            {
-                // Compare material colors
-                if (myRenderer.material.color == otherRenderer.material.color)
-                {
-                    // Destroy the incoming object and this object
-                    Destroy(collision.gameObject);
-                    Destroy(gameObject);
-                }
-                if (myRenderer.material.color != otherRenderer.material.color)
-                {
-                    // Destroy the incoming object and this object
-                    Destroy(collision.gameObject);
-                }
-            }
+            enemyColor = enemyRenderer.material.color;
         }
+    }
+
+    public virtual void TakeDamage()
+    {
+        if (GM.Instance != null)
+        {
+            GM.Instance.AddScore(ScoreValue);
+        }
+
+        Destroy(gameObject);
     }
 }

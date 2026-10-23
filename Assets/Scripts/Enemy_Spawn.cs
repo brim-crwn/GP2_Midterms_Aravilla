@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class Enemy_Spawn : MonoBehaviour
 {
-    public GameObject objectPrefab;
-    public Transform centerPoint;
-    public float minRadius = 5f;
-    public float maxRadius = 15f;
-    public float spawnInterval = 3f;
+    [SerializeField] private GameObject[] objectPrefabs;
+    [SerializeField] private Transform centerPoint;
+
+    private float minRadius = 50f;
+    private float maxRadius = 50f;
+    private float spawnInterval = 3f;
 
     void Start()
     {
@@ -25,14 +26,17 @@ public class Enemy_Spawn : MonoBehaviour
 
     void SpawnOutsideRadius()
     {
+
         float angle = Random.Range(0f, Mathf.PI * 2f);
         float distance = Random.Range(minRadius, maxRadius);
 
-        
         float x = Mathf.Cos(angle) * distance;
         float z = Mathf.Sin(angle) * distance;
 
         Vector3 spawnPosition = centerPoint.position + new Vector3(x, 0.5f, z);
-        Instantiate(objectPrefab, spawnPosition, Quaternion.identity);
+
+        int randomIndex = Random.Range(0, objectPrefabs.Length);
+
+        Instantiate(objectPrefabs[randomIndex], spawnPosition, Quaternion.identity);
     }
 }
